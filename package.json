@@ -2,10 +2,10 @@
   "name": "ht2025da559a-lab2",
   "version": "1.0.0",
   "description": "Assignment Lab2 in DA599A",
-  "main": "index.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mikael Holst Mattsson",
