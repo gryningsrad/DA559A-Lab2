@@ -3,11 +3,14 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { errorHandler } from './src/errorHandler.js';
 
 // Import routes
 import tasksRouter from './routes/tasks.js';
 import usersRouter from './routes/users.js';
-import api from './routes/api.js';
+import api_users from './routes/api_users.js';
+import api_tasks from './routes/api_tasks.js';
+import { router as jwt } from './routes/jwt.js';
 
 export const app = express();
 
@@ -27,21 +30,14 @@ app.set('views', path.join(path.dirname(fileURLToPath(import.meta.url)), 'views'
 // Use routes
 app.use('/tasks', tasksRouter);
 app.use('/users', usersRouter);
-app.use('/api', api);
-
-// Error handler for 404
-app.use((req, res, next) => {
-  const err = new Error('Not Found')
-  err.status = 404
-  next(err)
+app.use('/api', api_users);
+app.use('/api', api_tasks);
+app.use('/jwt', jwt);
+app.use('/health', (req, res) => {
+  res.status(200).json({ status: 'Server is running' });
 });
 
-// Global errorhandler
-app.use((err, req, res, next) => {
-  const status = err.status || 500
-  console.error(err)
-  res.status(status).json({
-    status,
-    message: err.message
-  })
-});
+
+
+app.use(errorHandler.errorNotFound);
+app.use(errorHandler.errorDefault);

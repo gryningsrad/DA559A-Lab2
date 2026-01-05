@@ -1,0 +1,44 @@
+@startuml JWT Authentication in Express API
+
+title JWT Authentication in Express API
+
+actor Client
+participant "Express API" as API
+participant "Auth Controller" as Auth
+participant "User DB" as DB
+participant "JWT Service" as JWT
+
+== Login ==
+Client -> API: POST /auth/login\n{email, password}
+API -> Auth: login(email, password)
+Auth -> DB: findUserByEmail(email)
+DB --> Auth: user + hashedPassword
+Auth -> Auth: verifyPassword()
+
+
+alt Incorrect details
+Auth --> API: 401 Unauthorized
+API --> Client: Felmeddelande
+else Correct details
+Auth -> JWT: sign(accessToken)
+JWT --> Auth: accessToken
+Auth --> API: 200 OK + token
+API --> Client: { accessToken }
+end
+
+
+== Protected resource ==
+Client -> API: GET /api/protected\nAuthorization: Bearer token
+API -> JWT: verify(token)
+
+
+alt Invalid / old token
+JWT --> API: error
+API --> Client: 401 Unauthorized
+else Valid token
+JWT --> API: decoded payload (userId)
+API -> API: attach user to request
+API --> Client: 200 OK + data
+end
+
+@enduml
